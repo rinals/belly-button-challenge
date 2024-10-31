@@ -29,29 +29,60 @@ function buildCharts(sample) {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
 
     // Get the samples field
-
+    const samples = data.samples;
 
     // Filter the samples for the object with the desired sample number
-
+    const resultArray = samples.filter(sampleObj => sampleObj.id == sample);
+    const result = resultArray[0];
 
     // Get the otu_ids, otu_labels, and sample_values
-
+    const otu_ids = result.otu_ids;
+    const otu_labels = result.otu_labels;
+    const sample_values = result.sample_values;
 
     // Build a Bubble Chart
+    const bubbleData = [{
+      x: otu_ids,
+      y: sample_values,
+      text: otu_labels,
+      mode: "markers",
+      marker: {
+        size: sample_values,
+        color: otu_ids,
+        colorscale: "Earth"
+      }
+    }];
 
+    const bubbleLayout = {
+      title: "OTUs in Sample",
+      xaxis: { title: "OTU ID" },
+      yaxis: { title: "Sample Value" }
+    };
 
     // Render the Bubble Chart
-
+    Plotly.newPlot("bubble", bubbleData, bubbleLayout);
 
     // For the Bar Chart, map the otu_ids to a list of strings for your yticks
-
+    const yticks = otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse();
 
     // Build a Bar Chart
     // Don't forget to slice and reverse the input data appropriately
+    const barData = [{
+      x: sample_values.slice(0, 10).reverse(),
+      y: yticks,
+      text: otu_labels.slice(0, 10).reverse(),
+      type: "bar",
+      orientation: "h"
+    }];
 
+    const barLayout = {
+      title: "Top 10 OTUs Found"
+    };
+
+    Plotly.newPlot("bar", barData, barLayout);
 
     // Render the Bar Chart
-
+    Plotly.newPlot("bar", barData, barLayout);
   });
 }
 
